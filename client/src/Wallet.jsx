@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { Select } from "@chakra-ui/react";
 
-function Wallet({ addresses }) {
+function Wallet({ addresses, onSenderChange }) {
   const [sender, selectSender] = useState(null);
 
   const handleSelectChange = (event) => {
     const selectedValue = event.target.value;
-    selectSender(addresses.find((a) => a.address == selectedValue));
+    const selectedSender = addresses.find((a) => a.address == selectedValue);
+    selectSender(selectedSender);
+    onSenderChange(selectedSender);
   };
 
   return (

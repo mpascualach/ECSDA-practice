@@ -17,7 +17,7 @@ for (let i = 0; i < 3; i++) {
 const balances = {};
 
 for (let i = 0; i < generatedAddresses.length; i++) {
-  const address = generatedAddresses;
+  const address = generatedAddresses[i];
   if (i === 0) {
     balances[address] = 100;
   } else if (i === 1) {
@@ -26,8 +26,6 @@ for (let i = 0; i < generatedAddresses.length; i++) {
     balances[address] = 60;
   }
 }
-
-console.log("Balances: ", balances);
 
 app.get("/balances", (req, res) => {
   res.send(balances);
@@ -45,12 +43,12 @@ app.post("/send", (req, res) => {
   setInitialBalance(sender);
   setInitialBalance(recipient);
 
-  if (balances[sender] < amount) {
+  if (balances[sender.address] < amount) {
     res.status(400).send({ message: "Not enough funds!" });
   } else {
-    balances[sender] -= amount;
-    balances[recipient] += amount;
-    res.send({ balance: balances[sender] });
+    balances[sender.address] -= amount;
+    balances[recipient.address] += amount;
+    res.send({ balance: balances[sender.address] });
   }
 });
 
@@ -59,7 +57,7 @@ app.listen(port, () => {
 });
 
 function setInitialBalance(address) {
-  if (!balances[address]) {
-    balances[address] = 0;
+  if (!balances[address.address]) {
+    balances[address.address] = 0;
   }
 }

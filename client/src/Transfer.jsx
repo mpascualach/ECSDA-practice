@@ -2,34 +2,31 @@ import { useState } from "react";
 import server from "./server";
 import { Select } from "@chakra-ui/react";
 
-function Transfer({ addresses }) {
+function Transfer({
+  addresses,
+  onAmountChange,
+  onRecipientChange,
+  onTransfer,
+}) {
   const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
   const handleAmountChange = (event) => {
     setAmount(event.target.value);
+    onAmountChange(event.target.value);
   };
 
   const handleSelectChange = (event) => {
     const selectedValue = event.target.value;
-    setRecipient(addresses.find((a) => a.address == selectedValue));
+    const selectedRecipient = addresses.find((a) => a.address == selectedValue);
+    setRecipient(selectedRecipient);
+    onRecipientChange(selectedRecipient);
   };
 
   async function transfer(evt) {
     evt.preventDefault();
 
-    try {
-      const {
-        data: { balance },
-      } = await server.post(`send`, {
-        sender: address,
-        amount: parseInt(amount),
-        recipient,
-      });
-      setBalance(balance);
-    } catch (ex) {
-      alert(ex.response.data.message);
-    }
+    onTransfer();
   }
 
   return (
