@@ -1,11 +1,19 @@
 import { useState } from "react";
 import server from "./server";
+import { Select } from "@chakra-ui/react";
 
-function Transfer({ address, setBalance }) {
-  const [sendAmount, setSendAmount] = useState("");
+function Transfer({ addresses }) {
+  const [amount, setAmount] = useState("");
   const [recipient, setRecipient] = useState("");
 
-  const setValue = (setter) => (evt) => setter(evt.target.value);
+  const handleAmountChange = (event) => {
+    setAmount(event.target.value);
+  };
+
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    setRecipient(addresses.find((a) => a.address == selectedValue));
+  };
 
   async function transfer(evt) {
     evt.preventDefault();
@@ -15,7 +23,7 @@ function Transfer({ address, setBalance }) {
         data: { balance },
       } = await server.post(`send`, {
         sender: address,
-        amount: parseInt(sendAmount),
+        amount: parseInt(amount),
         recipient,
       });
       setBalance(balance);
@@ -32,18 +40,20 @@ function Transfer({ address, setBalance }) {
         Send Amount
         <input
           placeholder="1, 2, 3..."
-          value={sendAmount}
-          onChange={setValue(setSendAmount)}
+          value={amount}
+          onChange={handleAmountChange}
         ></input>
       </label>
 
       <label>
         Recipient
-        <input
-          placeholder="Type an address, for example: 0x2"
-          value={recipient}
-          onChange={setValue(setRecipient)}
-        ></input>
+        <Select onChange={handleSelectChange} placeholder="Select an address">
+          {addresses.map((address) => (
+            <option value={address.address} key={address.address}>
+              {address.address}
+            </option>
+          ))}
+        </Select>
       </label>
 
       <input type="submit" className="button" value="Transfer" />

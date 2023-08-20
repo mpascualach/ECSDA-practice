@@ -1,9 +1,13 @@
 const secp = require("ethereum-cryptography/secp256k1");
+const { keccak256 } = require("ethereum-cryptography/keccak.js");
 const { toHex } = require("ethereum-cryptography/utils");
 
-const privateKey = secp.secp256k1.utils.randomPrivateKey();
+function generateAddress() {
+  const privateKey = secp.secp256k1.utils.randomPrivateKey();
+  const publicKey = secp.secp256k1.getPublicKey(privateKey, false);
+  const hashed = keccak256(publicKey);
+  const addressBytes = hashed.slice(-20);
+  return "0x" + toHex(addressBytes);
+}
 
-console.log("private key: ", toHex(privateKey));
-
-const publicKey = secp.secp256k1.getPublicKey(privateKey, false);
-console.log("public key: ", toHex(publicKey));
+module.exports = generateAddress;

@@ -1,48 +1,30 @@
-import server from "./server";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Select } from "@chakra-ui/react";
 
-import * as secp from "ethereum-cryptography/secp256k1";
-import { toHex } from "ethereum-cryptography/utils";
+function Wallet({ addresses }) {
+  const [sender, selectSender] = useState(null);
 
-function Wallet({
-  address,
-  setAddress,
-  balance,
-  setBalance,
-  privateKey,
-  setPrivateKey,
-}) {
-  async function onChange(evt) {
-    const privateKey = evt.target.value;
-    setPrivateKey(privateKey);
-    const address = toHex(secp.secp256k1.getPublicKey(privateKey, false));
-    setAddress(address);
-    if (address) {
-      const {
-        data: { balance },
-      } = await server.get(`balance/${address}`);
-      setBalance(balance);
-    } else {
-      setBalance(0);
-    }
-  }
+  const handleSelectChange = (event) => {
+    const selectedValue = event.target.value;
+    selectSender(addresses.find((a) => a.address == selectedValue));
+  };
 
   return (
     <div className="container wallet">
       <h1>Your Wallet</h1>
 
       <label>
-        Private Key
-        <input
-          placeholder="Type a private key, for example: 0x1"
-          value={privateKey}
-          onChange={onChange}
-        ></input>
+        Address
+        <Select onChange={handleSelectChange} placeholder="Select an address">
+          {addresses.map((address) => (
+            <option value={address.address} key={address.address}>
+              {address.address}
+            </option>
+          ))}
+        </Select>
       </label>
 
-      <div>Address: {address.slice(0, 10)}... </div>
-
-      <div className="balance">Balance: {balance}</div>
+      <div className="balance">Balance: {sender ? sender.balance : "..."}</div>
     </div>
   );
 }

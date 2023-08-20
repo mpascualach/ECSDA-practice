@@ -3,15 +3,35 @@ const app = express();
 const cors = require("cors");
 const port = 3042;
 
+const generateAddress = require("./scripts/generate");
+
 app.use(cors());
 app.use(express.json());
 
-const balances = {
-  // convert last 20 bytes?
-  "3e3dc6be8442c8b6eff302c6eda02d84bc13e93c0e6d23d8cda3749a6257c5c2": 100,
-  fbae39602162426cf13725bac03ac70dd13fa104cef147c55791901282d9a051: 50,
-  "5bbe4307a6dfd6b21f079371077a7c0f853d4b4b525ec10c4310d2917e88d13d": 75,
-};
+const generatedAddresses = [];
+
+for (let i = 0; i < 3; i++) {
+  generatedAddresses.push(generateAddress());
+}
+
+const balances = {};
+
+for (let i = 0; i < generatedAddresses.length; i++) {
+  const address = generatedAddresses;
+  if (i === 0) {
+    balances[address] = 100;
+  } else if (i === 1) {
+    balances[address] = 80;
+  } else {
+    balances[address] = 60;
+  }
+}
+
+console.log("Balances: ", balances);
+
+app.get("/balances", (req, res) => {
+  res.send(balances);
+});
 
 app.get("/balance/:address", (req, res) => {
   const { address } = req.params;
